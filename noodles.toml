@@ -1,0 +1,21 @@
+Description = "Sauron is an extensible page parser"
+License = "Apache-2.0"
+Name = "Sauron"
+Version = 0.1
+
+[Projects]
+	[Projects.sauron]
+		ConsolidateChildDirs = false
+		Destination = ""
+		DisableNestedEnvironment = true
+		Plugin = "go"
+		SimpleName = "sauron"
+		Source = "*.go"
+		Type = "package"
+	[Projects.tests]
+		ConsolidateChildDirs = false
+		Destination = "build/sauron-tests"
+		DisableNestedEnvironment = true
+		Plugin = "go"
+		Source = "tests/*.go"
+		Type = "binary"
