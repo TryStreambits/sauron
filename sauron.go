@@ -122,7 +122,6 @@ func GetLink(urlPath string) (link *Link, parseErr error) {
 		return
 	} else { // No handler
 		link, parseErr = Primitive(doc, u, urlPath) // Pass along to our primitive parser
-		return
 	}
 
 	return
