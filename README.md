@@ -11,7 +11,7 @@ The purpose of Sauron is to enable the easy implementation of page or website pa
 
 ## Using
 
-To use Sauron in your application, all you need to do is ensure you are importing `github.com/JoshStrobl/sauron`. Then follow our documentation linked above or look at `tests/` for example code.
+To use Sauron in your application, all you need to do is ensure you are importing `github.com/JoshStrobl/sauron`. Then follow the documentation linked above or look at `tests/` for example code.
 
 ## Building
 
