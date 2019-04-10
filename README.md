@@ -6,6 +6,7 @@ The purpose of Sauron is to enable the easy implementation of page or website pa
 
 [![](https://img.shields.io/badge/Donate-Flattr-red.svg?style=for-the-badge&link=https://flattr.com/@JoshStrobl&link=https://flattr.com/@JoshStrobl)](https://flattr.com/@JoshStrobl)
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](https://godoc.org/github.com/JoshStrobl/sauron)
+[![goreportcard](https://img.shields.io/badge/goreportcard-A+-green.svg?style=for-the-badge)](https://goreportcard.com/report/github.com/JoshStrobl/sauron)
 ![GitHub](https://img.shields.io/github/license/JoshStrobl/sauron.svg?style=for-the-badge)
 
 ## Using
