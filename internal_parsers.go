@@ -192,7 +192,7 @@ func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 			link.Extras["IsPlaylist"] = "true"
 
 			if imageURL, parseErr := url.Parse(link.Image); parseErr == nil { // Parse our link image
-				imageURL.RawQuery = "" // Clear out query
+				imageURL.RawQuery = ""         // Clear out query
 				link.Image = imageURL.String() // Convert back to string
 			} else {
 				parserErr = parseErr
