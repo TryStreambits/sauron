@@ -87,6 +87,32 @@ func Primitive(doc *goquery.Document, url *url.URL, fullURL string) (link *Link,
 
 	// #endregion
 
+	// #region Image Parsing
+
+	var image string // Set image to an empty string
+
+	if opengraphImage, hasOpenGraphImage := doc.Find(`meta[name="og:image"]`).Attr("content"); hasOpenGraphImage { // If we found an OpenGraph image
+		image = opengraphImage
+	} else { // If we did not find an OpenGraph Image
+		if firstImage, hasImageOnPage := doc.Find("img").Attr("src"); hasImageOnPage { // If we found an image on the page, so just the first one we find
+			image = firstImage
+		}
+	}
+
+	link.Image = image
+
+	if link.Image != "" && !strings.HasPrefix(link.Image, "http") { // If a link is relative
+		prefixString := url.Scheme + ":"
+
+		if !strings.HasPrefix(link.Image, "//") { // If it doesn't start with //, which is common for Reddit or relative to the scheme being used
+			prefixString += "//" // Append //
+		}
+
+		link.Image = prefixString + link.Image // Prepend
+	}
+
+	// #endregion
+
 	return
 }
 
@@ -150,7 +176,11 @@ func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 		}
 
 		link.Extras["IsPlaylist"] = strconv.FormatBool(strings.HasPrefix(url.Path, "/playlist")) // IsPlaylist will be set to true if path begins with /playlist
-		link.Extras["IsVideo"] = strconv.FormatBool(strings.HasPrefix(url.Path, "/watch"))       // IsVideo will be set to true if path begins with /watch
+
+		if strings.HasPrefix(url.Path, "/watch") { // Is a Video
+			link.Image = "https://img.youtube.com/vi/" + link.Extras["Video"] + "/maxresdefault.jpg"
+			link.Extras["IsVideo"] = "true"
+		}
 	}
 
 	return
