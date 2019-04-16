@@ -9,10 +9,15 @@ import (
 
 // This files contains our internally supported parsers
 
+// MetaImageNames is an array of meta names commonly associated with site images
+var MetaImageNames []string
+
 // YoutubeQueriesToExtras is query info to extra metadata
 var YoutubeQueriesToExtras map[string]string
 
 func init() {
+	MetaImageNames = []string{"og:image", "twitter:image"}
+
 	YoutubeQueriesToExtras = map[string]string{
 		"i":    "Index",
 		"list": "Playlist",
@@ -91,9 +96,14 @@ func Primitive(doc *goquery.Document, url *url.URL, fullURL string) (link *Link,
 
 	var image string // Set image to an empty string
 
-	if opengraphImage, hasOpenGraphImage := doc.Find(`meta[name="og:image"]`).Attr("content"); hasOpenGraphImage { // If we found an OpenGraph image
-		image = opengraphImage
-	} else { // If we did not find an OpenGraph Image
+	for _, metaImageType := range MetaImageNames {
+		if metaImage, hasMetaImage := doc.Find(`meta[name="` + metaImageType + `"]`).Attr("content"); hasMetaImage { // If we found this meta image
+			image = metaImage
+			break
+		}
+	}
+
+	if image == "" { // If we did not find an image from the metadata
 		if firstImage, hasImageOnPage := doc.Find("img").Attr("src"); hasImageOnPage { // If we found an image on the page, so just the first one we find
 			image = firstImage
 		}
@@ -175,7 +185,19 @@ func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 			}
 		}
 
-		link.Extras["IsPlaylist"] = strconv.FormatBool(strings.HasPrefix(url.Path, "/playlist")) // IsPlaylist will be set to true if path begins with /playlist
+		link.Extras["IsPlaylist"] = "false"
+		link.Extras["IsVideo"] = "false"
+
+		if strings.HasPrefix(url.Path, "/playlist") { // Is a Playlist
+			link.Extras["IsPlaylist"] = "true"
+
+			if imageURL, parseErr := url.Parse(link.Image); parseErr == nil { // Parse our link image
+				imageURL.RawQuery = "" // Clear out query
+				link.Image = imageURL.String() // Convert back to string
+			} else {
+				parserErr = parseErr
+			}
+		}
 
 		if strings.HasPrefix(url.Path, "/watch") { // Is a Video
 			link.Image = "https://img.youtube.com/vi/" + link.Extras["Video"] + "/maxresdefault.jpg"

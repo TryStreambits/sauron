@@ -22,6 +22,20 @@ func main() {
 		trunk.LogErr(fmt.Sprintf("Failed to get Big Buck Bunny: %v", linkErr))
 	}
 
+	playlistTestLink, playlistTestLinkErr := sauron.GetLink("https://www.youtube.com/playlist?list=PLFF5D72E24079FB50")
+
+	if playlistTestLinkErr == nil { // Successfully got playlist
+		if playlistTestLink.Title == "Mat Kearney - Young Love" && // Name matches
+			playlistTestLink.Extras["IsPlaylist"] == "true" && // Is a Playlist
+			playlistTestLink.Image == "https://i.ytimg.com/vi/FANROVxej50/hqdefault.jpg" { // Playlist Image matches
+			trunk.LogSuccess(fmt.Sprintf("Fetched Youtube Playlist. Has the following content: %s\n", playlistTestLink))
+		} else {
+			trunk.LogErr(fmt.Sprintf("Successfully fetched Youtube Playlist but content does not match expectation: %s\n", playlistTestLink))
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get Youtube Playlist: %v", playlistTestLink))
+	}
+
 	redditPost, redditLinkErr := sauron.GetLink("https://www.reddit.com/r/SolusProject/comments/b2a8x0/solus_4_fortitude_released_solus/")
 
 	if redditLinkErr == nil { // Successfully got reddit post
