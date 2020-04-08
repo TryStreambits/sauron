@@ -10,6 +10,14 @@ import (
 )
 
 func main() {
+	twitter, twitterLinkErr := sauron.GetLink("https://twitter.com/trystreambits/status/1246090584714027010")
+
+	if twitterLinkErr == nil { // Got Twitter link data
+		trunk.LogSuccess("Got @trystreambits Tweet")
+		fmt.Printf("%v\n", twitter)
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get Tweet: %v", twitterLinkErr))
+	}
 	bigBuckBunnyLink, linkErr := sauron.GetLink("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 
 	if linkErr == nil { // Successfully got link data

@@ -16,7 +16,8 @@ func NewHTTPClient(u *url.URL) (client http.Client, request http.Request) {
 	}
 
 	var requestHeaders = make(http.Header)
-	requestHeaders.Set("User-Agent", "Sauron Bot 0.1")
+	requestHeaders.Set("Accept-Language", RequestLanguage) // Prefer English
+	requestHeaders.Set("User-Agent", UserAgent)
 
 	request = http.Request{
 		Header: requestHeaders,

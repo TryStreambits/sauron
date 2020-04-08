@@ -15,6 +15,12 @@ var HasOverriddenInternals map[string]bool
 // HostToParsers is our map of hostnames to custom parsers
 var HostToParsers map[string]LinkParser
 
+// RequestLanguage is the desired language to request a page with. Defaults to en-US / en
+var RequestLanguage string
+
+// UserAgent is the desired User Agent to report to a page via request. Defaults to Sauron Bot $VERSION (e.g. Sauron Bot 0.1)
+var UserAgent string
+
 const (
 	// HostAlreadyRegistered is an error message for when host already has registered parser
 	HostAlreadyRegistered = "Host already has a registered parser"
@@ -42,6 +48,9 @@ func init() {
 		"youtu.be":       Youtube,
 		"youtube.com":    Youtube,
 	}
+
+	RequestLanguage = "en-US,en;q=0.5"
+	UserAgent = "Sauron Bot 0.1"
 }
 
 // ForceRegister will force register a LinkParser against the provided hostname
@@ -151,6 +160,26 @@ func Register(hostName string, parser LinkParser) (regErr error) {
 	}
 
 	return
+}
+
+// SetRequestLanguage will set the Accept-Language header for page requests
+// This does not necessarily mean the page supports the language or will return with that language
+func SetRequestLanguage(lang string) error {
+	if lang == "" { // If the language is empty
+		return errors.New("language must not be empty")
+	}
+
+	RequestLanguage = lang
+	return nil
+}
+
+func SetUserAgent(agent string) error {
+	if agent == "" {
+		return errors.New("user agent must not be empty")
+	}
+
+	UserAgent = agent
+	return nil
 }
 
 // Unregister will unregister a LinkParser with the specified hostname

@@ -12,18 +12,8 @@ import (
 // MetaImageNames is an array of meta names commonly associated with site images
 var MetaImageNames []string
 
-// YoutubeQueriesToExtras is query info to extra metadata
-var YoutubeQueriesToExtras map[string]string
-
 func init() {
 	MetaImageNames = []string{"og:image", "twitter:image"}
-
-	YoutubeQueriesToExtras = map[string]string{
-		"i":    "Index",
-		"list": "Playlist",
-		"t":    "Time",
-		"v":    "Video",
-	}
 }
 
 // Primitive is our primitive parser
@@ -122,88 +112,6 @@ func Primitive(doc *goquery.Document, url *url.URL, fullURL string) (link *Link,
 	}
 
 	// #endregion
-
-	return
-}
-
-// Reddit is our internal Reddit parser
-// This parser will get page information as well as Reddit post information such as dislikes, likes, and overall score
-func Reddit(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, parserErr error) {
-	link, parserErr = Primitive(doc, url, fullURL) // First get our link information from Primitive
-
-	dislikes := doc.Find(".unvoted > .dislikes").Text()
-	likes := doc.Find(".unvoted > .likes").Text()
-	score := doc.Find(".unvoted > .unvoted").Text()
-
-	link.Extras["Dislikes"] = dislikes
-	link.Extras["Likes"] = likes
-	link.Extras["Score"] = score
-
-	// #region Percentage Calculation
-
-	if dislikes != "" && likes != "" && score != "" {
-		var convertScoreErr error
-		var downvotes int
-		var upvotes int
-
-		downvotes, convertScoreErr = strconv.Atoi(dislikes)
-
-		if convertScoreErr == nil { // No error converting downvotes
-			upvotes, convertScoreErr = strconv.Atoi(likes)
-		}
-
-		if convertScoreErr == nil { // No error converting downvotes and upvotes
-			percentage := int((float64(downvotes) / float64(upvotes)) * 100)
-
-			if percentage == 0 { // 100% upvote
-				percentage = 100
-			}
-
-			link.Extras["Percentage"] = strconv.Itoa(percentage) // Convert our percentage to a string
-		}
-	}
-
-	// #endregion
-
-	return
-}
-
-// Youtube is our internal Youtube parser
-// This parser will get page information as well as add extra metadata for various shorteners and form factors
-func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, parserErr error) {
-	link, parserErr = Primitive(doc, url, fullURL)            // First get our link information from Primitive
-	link.Title = strings.TrimSuffix(link.Title, " - YouTube") // Strip - Youtube from the Title
-
-	if len(url.RawQuery) != 0 { // If we have query information
-		queries := strings.Split(url.RawQuery, "&") // Split on &
-
-		for _, query := range queries { // For each query
-			queryInfo := strings.Split(query, "=") // Split individual query into type and value
-
-			if extrasType, queryTypeExists := YoutubeQueriesToExtras[queryInfo[0]]; queryTypeExists { // If this query type exists
-				link.Extras[extrasType] = queryInfo[1] // Set in our extras the type to the value from queryInfo
-			}
-		}
-
-		link.Extras["IsPlaylist"] = "false"
-		link.Extras["IsVideo"] = "false"
-
-		if strings.HasPrefix(url.Path, "/playlist") { // Is a Playlist
-			link.Extras["IsPlaylist"] = "true"
-
-			if imageURL, parseErr := url.Parse(link.Image); parseErr == nil { // Parse our link image
-				imageURL.RawQuery = ""         // Clear out query
-				link.Image = imageURL.String() // Convert back to string
-			} else {
-				parserErr = parseErr
-			}
-		}
-
-		if strings.HasPrefix(url.Path, "/watch") { // Is a Video
-			link.Image = "https://img.youtube.com/vi/" + link.Extras["Video"] + "/maxresdefault.jpg"
-			link.Extras["IsVideo"] = "true"
-		}
-	}
 
 	return
 }
