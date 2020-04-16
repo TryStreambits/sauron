@@ -97,40 +97,57 @@ func GetLink(urlPath string) (link *Link, parseErr error) {
 		return
 	}
 
-	if response.StatusCode != 200 { // Page is not accessible
+	if response.StatusCode != 200 && response.StatusCode != 304 { // Page is not accessible or is not unmodified
 		parseErr = errors.New(PageNotAccessible)
 		return
 	}
 
-	if !strings.HasPrefix(response.Header.Get("content-type"), "text/html") { // If this is not an HTML page
+	contentType := response.Header.Get("content-type")
+	isHTML := strings.HasPrefix(contentType, "text/html")
+	isImage := strings.HasPrefix(contentType, "image/")
+
+	if !isHTML && !isImage { // If this is not an HTML page or image
 		parseErr = errors.New(PageContentNotValid)
 		return
 	}
 
-	pageContent, readErr := ioutil.ReadAll(response.Body) // Read the body
-	response.Body.Close()
+	if isImage { // If this is an image
+		link = &Link{
+			Description: "",
+			Favicon:     "",
+			Host:        u.Host,
+			Title:       "",
+			URI:         urlPath,
+			Extras: map[string]string{
+				"IsImageLink": "true",
+			},
+		}
+	} else if isHTML { // If this is an HTML page
+		pageContent, readErr := ioutil.ReadAll(response.Body) // Read the body
+		response.Body.Close()
 
-	if readErr != nil { // If we failed to read page content
-		parseErr = errors.New(PageContentNotValid)
-		return
-	}
+		if readErr != nil { // If we failed to read page content
+			parseErr = errors.New(PageContentNotValid)
+			return
+		}
 
-	var doc *goquery.Document
-	doc, parseErr = goquery.NewDocumentFromReader(bytes.NewReader(pageContent))
+		var doc *goquery.Document
+		doc, parseErr = goquery.NewDocumentFromReader(bytes.NewReader(pageContent))
 
-	if parseErr != nil { // If we failed to create a new document
-		parseErr = errors.New(PageContentNotValid)
-		return
-	}
+		if parseErr != nil { // If we failed to create a new document
+			parseErr = errors.New(PageContentNotValid)
+			return
+		}
 
-	if fnForDoc, fnForDocParserExists := HostToParsers[urlForDocument.Host]; fnForDocParserExists { // If we have a parser for our document
-		link, parseErr = fnForDoc(doc, urlForDocument, urlPath) // Pass along to our function
-		return
-	} else if fnNoDoc, fnParserExists := HostToParsers[u.Host]; fnParserExists { // If we have a parser for our non-parsed / handled URL
-		link, parseErr = fnNoDoc(doc, u, urlPath) // Pass along to our function
-		return
-	} else { // No handler
-		link, parseErr = Primitive(doc, u, urlPath) // Pass along to our primitive parser
+		if fnForDoc, fnForDocParserExists := HostToParsers[urlForDocument.Host]; fnForDocParserExists { // If we have a parser for our document
+			link, parseErr = fnForDoc(doc, urlForDocument, urlPath) // Pass along to our function
+			return
+		} else if fnNoDoc, fnParserExists := HostToParsers[u.Host]; fnParserExists { // If we have a parser for our non-parsed / handled URL
+			link, parseErr = fnNoDoc(doc, u, urlPath) // Pass along to our function
+			return
+		} else { // No handler
+			link, parseErr = Primitive(doc, u, urlPath) // Pass along to our primitive parser
+		}
 	}
 
 	return

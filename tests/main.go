@@ -10,6 +10,19 @@ import (
 )
 
 func main() {
+	image, imageLinkErr := sauron.GetLink("https://i3.ytimg.com/vi/OE-Y-PotqTQ/maxresdefault.jpg")
+
+	if imageLinkErr == nil { // Got the Image
+		if image.Extras["IsImageLink"] == "true" { // If we have an Extras metadata set
+			trunk.LogSuccess("Got JPG")
+			fmt.Printf("%\v", image)
+		} else {
+			trunk.LogErr("Failed to determine that our image is precisely that.")
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get Image: %v", imageLinkErr))
+	}
+
 	twitter, twitterLinkErr := sauron.GetLink("https://twitter.com/trystreambits/status/1246090584714027010")
 
 	if twitterLinkErr == nil { // Got Twitter link data
