@@ -15,12 +15,25 @@ func main() {
 	if imageLinkErr == nil { // Got the Image
 		if image.Extras["IsImageLink"] == "true" { // If we have an Extras metadata set
 			trunk.LogSuccess("Got JPG")
-			fmt.Printf("%\v", image)
+			fmt.Printf("%v\n", image)
 		} else {
 			trunk.LogErr("Failed to determine that our image is precisely that.")
 		}
 	} else {
 		trunk.LogErr(fmt.Sprintf("Failed to get Image: %v", imageLinkErr))
+	}
+
+	video, videoLinkErr := sauron.GetLink("http://mirrors.standaloneinstaller.com/video-sample/small.mp4")
+
+	if videoLinkErr == nil { // Got the video
+		if video.Extras["IsVideoLink"] == "true" { // If we have an Extras metadata set
+			trunk.LogSuccess("Got MP4")
+			fmt.Printf("%v\n", video)
+		} else {
+			trunk.LogErr("Failed to determine that our video is prcisely that.")
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get Video: %v", videoLinkErr))
 	}
 
 	twitter, twitterLinkErr := sauron.GetLink("https://twitter.com/trystreambits/status/1246090584714027010")

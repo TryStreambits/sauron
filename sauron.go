@@ -105,22 +105,29 @@ func GetLink(urlPath string) (link *Link, parseErr error) {
 	contentType := response.Header.Get("content-type")
 	isHTML := strings.HasPrefix(contentType, "text/html")
 	isImage := strings.HasPrefix(contentType, "image/")
+	isVideo := strings.HasPrefix(contentType, "video/")
 
-	if !isHTML && !isImage { // If this is not an HTML page or image
+	if !isHTML && !isImage && !isVideo { // If this is not an HTML page or supported direct link
 		parseErr = errors.New(PageContentNotValid)
 		return
 	}
 
-	if isImage { // If this is an image
+	if isImage || isVideo { // If this is an image or video direct link
+		extras := make(map[string]string)
+
+		if isImage { // If this is an image
+			extras["IsImageLink"] = "true"
+		} else if isVideo { // If this is a video
+			extras["IsVideoLink"] = "true"
+		} // Intentionally use else if so we can just continue to extend it in the future
+
 		link = &Link{
 			Description: "",
 			Favicon:     "",
 			Host:        u.Host,
 			Title:       "",
 			URI:         urlPath,
-			Extras: map[string]string{
-				"IsImageLink": "true",
-			},
+			Extras:      extras,
 		}
 	} else if isHTML { // If this is an HTML page
 		pageContent, readErr := ioutil.ReadAll(response.Body) // Read the body
