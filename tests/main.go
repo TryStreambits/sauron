@@ -44,13 +44,46 @@ func main() {
 	} else {
 		trunk.LogErr(fmt.Sprintf("Failed to get Tweet: %v", twitterLinkErr))
 	}
+
+	twitchStreamer, twitchStreamerLinkErr := sauron.GetLink("https://www.twitch.tv/towelliee")
+
+	if twitchStreamerLinkErr == nil { // Successfully got the page
+		if twitchStreamer.Extras["Streamer"] != "Towelliee" || // Streamer isn't Towelliee
+			twitchStreamer.Extras["Game"] != "World of Warcraft" || // Game doesn't match expectation
+			twitchStreamer.Extras["GameLink"] != "https://www.twitch.tv/directory/game/World of Warcraft" || // Not expected URL for game
+			twitchStreamer.Extras["GameArtFull"] != "https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft.jpg" { // Full game art doesn't match
+			trunk.LogErr(fmt.Sprintf("Fetched Streamer details but does not match expectation: %s", twitchStreamer))
+		} else {
+			trunk.LogSuccess(fmt.Sprintf("Got Twitch streamer details: %v", twitchStreamer))
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get Twitch streamer: %v", twitchStreamerLinkErr))
+	}
+
+	twitchClip, twitchClipLinkErr := sauron.GetLink("https://www.twitch.tv/towelliee/clip/VastTentativeDinosaurGOWSkull")
+
+	if twitchClipLinkErr == nil { // Got the clip
+		if twitchClip.Title != "Towelliee - eclipse - Twitch" || // Title doesn't match expected
+			twitchClip.Extras["ClipName"] != "eclipse" || // Not eclipse
+			twitchClip.Extras["ClipSlug"] != "VastTentativeDinosaurGOWSkull" || // Slug doesn't match expected
+			twitchClip.Extras["Game"] != "World of Warcraft" || // Game doesn't match expectation
+			twitchClip.Extras["GameLink"] != "https://www.twitch.tv/directory/game/World of Warcraft" || // Not expected URL for game
+			twitchClip.Extras["GameArtFull"] != "https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft.jpg" { // Full game art doesn't match
+			trunk.LogErr(fmt.Sprintf("Fetched Clip details but does not match expectation: %s", twitchClip))
+		} else {
+			trunk.LogSuccess(fmt.Sprintf("Got Twitch clip details: %v", twitchClip))
+		}
+	} else { // Failed to get the clip
+		trunk.LogErr(fmt.Sprintf("Failed to get the Twitch clip: %v", twitchClipLinkErr))
+	}
+
 	bigBuckBunnyLink, linkErr := sauron.GetLink("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 
 	if linkErr == nil { // Successfully got link data
 		if bigBuckBunnyLink.Title == "Big Buck Bunny" && bigBuckBunnyLink.Extras["IsVideo"] == "true" { // Successfully fetched
-			trunk.LogSuccess(fmt.Sprintf("Fetched Big Buck Bunny. Has the following content: %s\n", bigBuckBunnyLink))
+			trunk.LogSuccess(fmt.Sprintf("Fetched Big Buck Bunny. Has the following content: %s", bigBuckBunnyLink))
 		} else { // Details do not match
-			trunk.LogErr(fmt.Sprintf("Successfully fetched Big Buck Bunny but content does not match expectation: %s\n", bigBuckBunnyLink))
+			trunk.LogErr(fmt.Sprintf("Successfully fetched Big Buck Bunny but content does not match expectation: %s", bigBuckBunnyLink))
 		}
 	} else { // If we failed to fetch Big Buck Bunny
 		trunk.LogErr(fmt.Sprintf("Failed to get Big Buck Bunny: %v", linkErr))

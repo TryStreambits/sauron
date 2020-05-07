@@ -37,14 +37,18 @@ const (
 
 func init() {
 	HasOverriddenInternals = map[string]bool{
-		"reddit.com":  false,
-		"youtube.com": false,
-		"youtu.be":    false,
+		"reddit.com":    false,
+		"twitch.tv":     false,
+		"www.twitch.tv": false,
+		"youtube.com":   false,
+		"youtu.be":      false,
 	}
 
 	HostToParsers = map[string]LinkParser{
 		"old.reddit.com": Reddit,
 		"reddit.com":     Reddit,
+		"twitch.tv":      Twitch,
+		"www.twitch.tv":  Twitch,
 		"youtu.be":       Youtube,
 		"youtube.com":    Youtube,
 	}
