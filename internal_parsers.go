@@ -99,6 +99,10 @@ func Primitive(doc *goquery.Document, url *url.URL, fullURL string) (link *Link,
 		}
 	}
 
+	if image != "" && strings.HasPrefix(image, "/") { // Image is set and is a relative URL
+		image = link.Host + image // Prepend host
+	}
+
 	link.Image = image
 
 	if link.Image != "" && !strings.HasPrefix(link.Image, "http") { // If a link is relative
