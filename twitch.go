@@ -45,6 +45,7 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 		content = strings.Replace(ClipRequestJSON, "CLIPSLUG", link.Extras["ClipSlug"], -1)
 	} else { // Hopefully a streamer
 		content = strings.Replace(ChannelRequestJSON, "CHANNEL", strings.Replace(url.Path, "/", "", -1), -1) // Replace our preset CHANNEL string
+		link.Extras["IsClip"] = "false"
 	}
 
 	request, requestNewErr := http.NewRequest("POST", "https://gql.twitch.tv/gql", bytes.NewBuffer([]byte(content)))
@@ -91,6 +92,7 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 
 		gql := gqlResponse[0] // Use our first response
 
+		link.Extras["IsChannel"] = "false"
 		link.Extras["Streamer"] = gql.Data.Clip.Broadcaster.DisplayName
 		link.Extras["ClipName"] = gql.Data.Clip.Title
 		link.Extras["ClipSlug"] = gql.Data.Clip.Slug
@@ -113,13 +115,13 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 		gql := gqlResponse[0] // Use our first response
 
 		if gql.Data.User.DisplayName == "" { // No Streamer name, which means this isn't a channel
-			delete(link.Extras, "IsClip") // Delete our IsClip extras info
+			link.Extras["IsChannel"] = "false" // Indicate this is not a channel
 			return // Stick with primitive data
 		}
 
 		link.Extras["Streamer"] = gql.Data.User.DisplayName
 		link.Title = fmt.Sprintf("%s - Twitch", link.Extras["Streamer"]) // Change to streamer name - Twitch
-		link.Extras["IsClip"] = "false"                                  // Indicate it is not a clip
+		link.Extras["IsChannel"] = "true" // Indicate this is a channel
 
 		link.Extras["StreamTitle"] = gql.Data.User.BroadcastSettings.Title
 		link.Extras["Game"] = gql.Data.User.BroadcastSettings.Game.Name
