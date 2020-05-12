@@ -4,14 +4,13 @@ Sauron is an extensible page parser written in Go.
 
 The purpose of Sauron is to enable the easy implementation of page or website parsers, with first-class support for common platforms or sites such as Reddit and Youtube.
 
-[![](https://img.shields.io/badge/Donate-Flattr-red.svg?style=for-the-badge&link=https://flattr.com/@JoshStrobl&link=https://flattr.com/@JoshStrobl)](https://flattr.com/@JoshStrobl)
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](https://godoc.org/github.com/JoshStrobl/sauron)
-[![goreportcard](https://img.shields.io/badge/goreportcard-A+-green.svg?style=for-the-badge)](https://goreportcard.com/report/github.com/JoshStrobl/sauron)
-![GitHub](https://img.shields.io/github/license/JoshStrobl/sauron.svg?style=for-the-badge)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](https://godoc.org/github.com/TryStreambits/sauron)
+[![goreportcard](https://img.shields.io/badge/goreportcard-A+-green.svg?style=for-the-badge)](https://goreportcard.com/report/github.com/TryStreambits/sauron)
+![GitHub](https://img.shields.io/github/license/TryStreambits/sauron.svg?style=for-the-badge)
 
 ## Using
 
-To use Sauron in your application, all you need to do is ensure you are importing `github.com/JoshStrobl/sauron`. Then follow the documentation linked above or look at `tests/` for example code.
+To use Sauron in your application, all you need to do is ensure you are importing `github.com/TryStreambits/sauron`. Then follow the documentation linked above or look at `tests/` for example code.
 
 ## Building
 

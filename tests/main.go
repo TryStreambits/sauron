@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/JoshStrobl/sauron"
 	"github.com/JoshStrobl/trunk"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TryStreambits/sauron"
 	"net/url"
 	"strings"
 )

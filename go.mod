@@ -1,4 +1,4 @@
-module github.com/JoshStrobl/sauron
+module github.com/TryStreambits/sauron
 
 go 1.12
 

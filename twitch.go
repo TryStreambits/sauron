@@ -116,12 +116,12 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 
 		if gql.Data.User.DisplayName == "" { // No Streamer name, which means this isn't a channel
 			link.Extras["IsChannel"] = "false" // Indicate this is not a channel
-			return // Stick with primitive data
+			return                             // Stick with primitive data
 		}
 
 		link.Extras["Streamer"] = gql.Data.User.DisplayName
 		link.Title = fmt.Sprintf("%s - Twitch", link.Extras["Streamer"]) // Change to streamer name - Twitch
-		link.Extras["IsChannel"] = "true" // Indicate this is a channel
+		link.Extras["IsChannel"] = "true"                                // Indicate this is a channel
 
 		link.Extras["StreamTitle"] = gql.Data.User.BroadcastSettings.Title
 		link.Extras["Game"] = gql.Data.User.BroadcastSettings.Game.Name
