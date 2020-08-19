@@ -69,12 +69,24 @@ func main() {
 			twitchClip.Extras["Game"] != "World of Warcraft" || // Game doesn't match expectation
 			twitchClip.Extras["GameLink"] != "https://www.twitch.tv/directory/game/World of Warcraft" || // Not expected URL for game
 			twitchClip.Extras["GameArtFull"] != "https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft.jpg" { // Full game art doesn't match
-			trunk.LogErr(fmt.Sprintf("Fetched Clip details but does not match expectation: %s", twitchClip))
+			trunk.LogErr(fmt.Sprintf("Fetched Clip details but does not match expectation: %v", twitchClip))
 		} else {
 			trunk.LogSuccess(fmt.Sprintf("Got Twitch clip details: %v", twitchClip))
 		}
 	} else { // Failed to get the clip
 		trunk.LogErr(fmt.Sprintf("Failed to get the Twitch clip: %v", twitchClipLinkErr))
+	}
+
+	twitchSecondaryClip, twitchSecondaryClipLinkErr := sauron.GetLink("https://clips.twitch.tv/VastTentativeDinosaurGOWSkull")
+
+	if twitchSecondaryClipLinkErr == nil { // Got the clip
+		if twitchSecondaryClip.Title != twitchClip.Title { // If our Title doesn't match our proper full Twitch clip URL
+			trunk.LogErr(fmt.Sprintf("Fetched Clip details but does not match expectation: %v", twitchSecondaryClip))
+		} else {
+			trunk.LogSuccess(fmt.Sprintf("Got Twitch clip details for clips.twitch.tv subdomain: %v", twitchSecondaryClip))
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get the Twitch clip via clips.twitch.tv: %v", twitchSecondaryClipLinkErr))
 	}
 
 	bigBuckBunnyLink, linkErr := sauron.GetLink("https://www.youtube.com/watch?v=YE7VzlLtp-4")

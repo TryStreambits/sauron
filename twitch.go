@@ -37,7 +37,7 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 
 	var content string
 
-	if strings.Contains(url.Path, "/clip/") { // Is a clip URL
+	if strings.Contains(url.Path, "/clip/") || link.Host == "clips.twitch.tv" { // Is a clip URL or has the clips.twitch.tv host
 		clipSplit := strings.Split(strings.TrimSuffix(url.Path, "/"), "/") // Split on /
 		link.Extras["ClipSlug"] = clipSplit[len(clipSplit)-1]              // Get the last item
 		link.Extras["IsClip"] = "true"                                     // Indicate it is a clip
