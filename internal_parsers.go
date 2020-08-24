@@ -3,6 +3,7 @@ package sauron
 import (
 	"github.com/PuerkitoBio/goquery"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -20,12 +21,18 @@ func init() {
 // This parser will get standard page information from the most commonly supported DOM Elements
 func Primitive(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, parserErr error) {
 	link = &Link{
-		Description: "",                       // Create an empty description for now
-		Favicon:     "",                       // Create an empty favicon for now
-		Host:        url.Host,                 // Set to our provided host
-		Title:       doc.Find("title").Text(), // Set to standard title
-		URI:         fullURL,                  // Set to provided URL
-		Extras:      make(map[string]string),  // Create an empty map
+		Description: "",                              // Create an empty description for now
+		Favicon:     "",                              // Create an empty favicon for now
+		Host:        url.Host,                        // Set to our provided host
+		Title:       doc.Find("head > title").Text(), // Set to standard title
+		URI:         fullURL,                         // Set to provided URL
+		Extras:      make(map[string]string),         // Create an empty map
+	}
+
+	if link.Title != "" { // If we got a title
+		weirdWhitespaceRegex := regexp.MustCompile(`\s{2,}`)                // Ensure any newlines or excessive whitespace is trimmed
+		link.Title = weirdWhitespaceRegex.ReplaceAllString(link.Title, " ") // Replace with a single whitespace
+		link.Title = strings.TrimSpace(link.Title)                          // Replace any prefixed and suffixed whitespace
 	}
 
 	// #region Description Fetching

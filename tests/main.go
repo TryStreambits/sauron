@@ -127,6 +127,11 @@ func main() {
 		trunk.LogErr(fmt.Sprintf("Failed to get Reddit post: %v", redditLinkErr))
 	}
 
+	downvotedPost, redditDownvoteLinkErr := sauron.GetLink("https://old.reddit.com/r/linux/comments/ielvry/linux_used_to_be_to_bring_life_to_your_old/")
+
+	if redditDownvoteLinkErr == nil { // Successfully got the downvoted reddit post
+		trunk.LogSuccess(fmt.Sprintf("Fetched downvoted Reddit post. Has the following content: %s\n", downvotedPost))
+	}
 	sauron.Register("joshuastrobl.com", PersonalSiteHandler)
 
 	personalSiteLink, personalLinkErr := sauron.GetLink("https://joshuastrobl.com")
@@ -139,6 +144,19 @@ func main() {
 		}
 	} else { // Failed to get personal site
 		trunk.LogErr(fmt.Sprintf("Failed to get Personal Site: %v", personalLinkErr))
+	}
+
+	gogLink, gogLinkErr := sauron.GetLink("https://www.gog.com/game/the_witcher")
+
+	if gogLinkErr == nil { // Got GOG
+		fmt.Println(gogLink.Title)
+		if gogLink.Title == "-85% The Witcher: Enhanced Edition on GOG.com" { // If we successfully fetched the title when they reuse it weirdly
+			trunk.LogSuccess(fmt.Sprintf("Fetched GOG site. Has the following content: %s\n", gogLink))
+		} else { // Failed to get the correct title
+			trunk.LogErr(fmt.Sprintf("Failed to fetch the GOG site which has weird title re-use: %s\n", gogLink))
+		}
+	} else {
+		trunk.LogErr(fmt.Sprintf("Failed to get GOG: %v", personalLinkErr))
 	}
 }
 

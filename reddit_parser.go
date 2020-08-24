@@ -13,26 +13,32 @@ func Reddit(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, pa
 
 	dislikes := doc.Find(".unvoted > .dislikes").Text()
 	likes := doc.Find(".unvoted > .likes").Text()
-	score := doc.Find(".unvoted > .unvoted").Text()
+	scoreStr := doc.Find(".unvoted > .unvoted").Text()
 
 	link.Extras["Dislikes"] = dislikes
 	link.Extras["Likes"] = likes
-	link.Extras["Score"] = score
+	link.Extras["Score"] = scoreStr
 
 	// #region Percentage Calculation
 
-	if dislikes != "" && likes != "" && score != "" {
-		var convertScoreErr error
-		var downvotes int
-		var upvotes int
+	if dislikes != "" && likes != "" && scoreStr != "" {
+		var score int
 
-		downvotes, convertScoreErr = strconv.Atoi(dislikes)
-
-		if convertScoreErr == nil { // No error converting downvotes
-			upvotes, convertScoreErr = strconv.Atoi(likes)
+		if score, parserErr = strconv.Atoi(scoreStr); parserErr != nil { // Failed to parse our score
+			return
 		}
 
-		if convertScoreErr == nil { // No error converting downvotes and upvotes
+		if score != 0 { // Have a score
+			var downvotes int
+			if downvotes, parserErr = strconv.Atoi(dislikes); parserErr != nil {
+				return
+			}
+
+			var upvotes int
+			if upvotes, parserErr = strconv.Atoi(likes); parserErr != nil {
+				return
+			}
+
 			percentage := int((float64(downvotes) / float64(upvotes)) * 100)
 
 			if percentage == 0 { // 100% upvote
@@ -40,6 +46,8 @@ func Reddit(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, pa
 			}
 
 			link.Extras["Percentage"] = strconv.Itoa(percentage) // Convert our percentage to a string
+		} else { // Score of 0
+			link.Extras["Percentage"] = "0" // Set to 0
 		}
 	}
 
