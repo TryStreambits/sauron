@@ -35,6 +35,8 @@ func Twitch(_doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 		Extras:      make(map[string]string), // Create an empty map
 	}
 
+	link.Extras["IsTwitchLink"] = "true" // Indicate it is a Twitch link
+
 	var content string
 
 	if strings.Contains(url.Path, "/clip/") || link.Host == "clips.twitch.tv" { // Is a clip URL or has the clips.twitch.tv host

@@ -11,6 +11,8 @@ import (
 func Reddit(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, parserErr error) {
 	link, parserErr = Primitive(doc, url, fullURL) // First get our link information from Primitive
 
+	link.Extras["IsRedditLink"] = "true" // Indicate it is a Reddit link
+
 	dislikes := doc.Find(".unvoted > .dislikes").Text()
 	likes := doc.Find(".unvoted > .likes").Text()
 	scoreStr := doc.Find(".unvoted > .unvoted").Text()

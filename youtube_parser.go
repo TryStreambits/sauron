@@ -24,6 +24,8 @@ func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 	link, parserErr = Primitive(doc, url, fullURL)            // First get our link information from Primitive
 	link.Title = strings.TrimSuffix(link.Title, " - YouTube") // Strip - Youtube from the Title
 
+	link.Extras["IsYouTubeLink"] = "true" // Indicate it is a YouTube link
+
 	if len(url.RawQuery) != 0 { // If we have query information
 		queries := strings.Split(url.RawQuery, "&") // Split on &
 
