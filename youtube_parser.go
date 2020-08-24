@@ -24,16 +24,18 @@ func Youtube(doc *goquery.Document, url *url.URL, fullURL string) (link *Link, p
 	link, parserErr = Primitive(doc, url, fullURL)            // First get our link information from Primitive
 	link.Title = strings.TrimSuffix(link.Title, " - YouTube") // Strip - Youtube from the Title
 
+	if link.Title == "" { // If this has no title
+		link.Title = doc.Find("meta[itemprop=\"name\"]").AttrOr("content", "YouTube")
+	}
+
 	link.Extras["IsYouTubeLink"] = "true" // Indicate it is a YouTube link
 
 	if len(url.RawQuery) != 0 { // If we have query information
-		queries := strings.Split(url.RawQuery, "&") // Split on &
+		for queryParam := range url.Query() { // For each map of query params to values
+			queryVal := url.Query().Get(queryParam) // Get the first value
 
-		for _, query := range queries { // For each query
-			queryInfo := strings.Split(query, "=") // Split individual query into type and value
-
-			if extrasType, queryTypeExists := YoutubeQueriesToExtras[queryInfo[0]]; queryTypeExists { // If this query type exists
-				link.Extras[extrasType] = queryInfo[1] // Set in our extras the type to the value from queryInfo
+			if extrasType, queryTypeExists := YoutubeQueriesToExtras[queryParam]; queryTypeExists { // If this query param exists
+				link.Extras[extrasType] = queryVal
 			}
 		}
 

@@ -81,12 +81,16 @@ func GetLink(urlPath string) (link *Link, parseErr error) {
 		oldFriendlyURL := strings.Replace(u.String(), u.Host, "old.reddit.com", -1) // Convert host to old.reddit.com
 		urlForDocument, parseErr = url.Parse(oldFriendlyURL)
 	} else if u.Host == "youtu.be" && !HasOverridden("youtu.be") { // If the host is the shortened YouTube URL and our internal parser has not been overridden
-		videoPath := strings.TrimPrefix(u.Path, "/")         // Trim the / from the start of the path
-		urlPath = "https://youtube.com/watch?v=" + videoPath // Correct urlPath
-		urlForDocument, parseErr = url.Parse(urlPath)        // Change url to more accurate struct
+		videoPath := strings.TrimPrefix(u.Path, "/")                              // Trim the / from the start of the path
+		urlPath = "https://youtube.com/watch?disable_polymer=true&v=" + videoPath // Correct urlPath
+		urlForDocument, parseErr = url.Parse(urlPath)                             // Change url to more accurate struct
 	} else if strings.HasSuffix(u.Host, "youtube.com") && !HasOverridden("youtube.com") && u.Host != "youtube.com" { // If the host is Youtube and our internal parser has not been overridden
 		normalYoutubeURL := strings.Replace(u.String(), u.Host, "youtube.com", -1) // Convert host to youtube.com
 		urlForDocument, parseErr = url.Parse(normalYoutubeURL)
+
+		customQuery := urlForDocument.Query()
+		customQuery.Set("disable_polymer", "true") // Disable polymer to get the full page content without JavaScript messiness
+		urlForDocument.RawQuery = customQuery.Encode()
 	} else {
 		urlForDocument, parseErr = url.Parse(u.String()) // Just duplicate u to urlForDocument
 	}
