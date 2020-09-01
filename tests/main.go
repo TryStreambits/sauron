@@ -49,9 +49,9 @@ func main() {
 
 	if twitchStreamerLinkErr == nil { // Successfully got the page
 		if twitchStreamer.Extras["Streamer"] != "Towelliee" || // Streamer isn't Towelliee
-			twitchStreamer.Extras["Game"] != "World of Warcraft" || // Game doesn't match expectation
-			twitchStreamer.Extras["GameLink"] != "https://www.twitch.tv/directory/game/World of Warcraft" || // Not expected URL for game
-			twitchStreamer.Extras["GameArtFull"] != "https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft.jpg" { // Full game art doesn't match
+			twitchStreamer.Extras["Game"] == "" || // Game is empty
+			!strings.HasPrefix(twitchStreamer.Extras["GameLink"], "https://www.twitch.tv/directory/game/") || // Not expected beginning of URL for game directory listing
+			!strings.HasPrefix(twitchStreamer.Extras["GameArtFull"], "https://static-cdn.jtvnw.net/ttv-boxart/") { // Not expected beginning of URL for box art
 			trunk.LogErr(fmt.Sprintf("Fetched Streamer details but does not match expectation: %s", twitchStreamer))
 		} else {
 			trunk.LogSuccess(fmt.Sprintf("Got Twitch streamer details: %v", twitchStreamer))
@@ -149,8 +149,7 @@ func main() {
 	gogLink, gogLinkErr := sauron.GetLink("https://www.gog.com/game/the_witcher")
 
 	if gogLinkErr == nil { // Got GOG
-		fmt.Println(gogLink.Title)
-		if gogLink.Title == "-85% The Witcher: Enhanced Edition on GOG.com" { // If we successfully fetched the title when they reuse it weirdly
+		if strings.HasSuffix(gogLink.Title, "The Witcher: Enhanced Edition on GOG.com") { // If we successfully fetched the title when they reuse it weirdly
 			trunk.LogSuccess(fmt.Sprintf("Fetched GOG site. Has the following content: %s\n", gogLink))
 		} else { // Failed to get the correct title
 			trunk.LogErr(fmt.Sprintf("Failed to fetch the GOG site which has weird title re-use: %s\n", gogLink))
